@@ -1,6 +1,6 @@
 # Team Work Contract
 
-Our team consists of Ben, Dylan, Kato, and Tommy. All of us are excited about the project, but given the amount of work required, we need to agree on best work practices. That's the purpose of this team work contract: to lay out specifically how we will work together as a team. Below are four sections outlining our goals for the project, how meetings will be conducted, work norms, and how decisions will be made.
+Our team consists of Ben, Dylan, Kato, and Tommy. All of us are excited about the project, but given the amount of work required, we need to agree on best work practices. That's the purpose of this team work contract: to lay out how we will work together as a team. Below are four sections outlining our goals for the project, how meetings will be conducted, work norms, and how decisions will be made.
 
 ## Goals
 
