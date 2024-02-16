@@ -4,7 +4,7 @@ Our team consists of Ben, Dylan, Kato, and Tommy. All of us are excited about th
 
 ## Goals
 
-The main goal of the project is to build a functional, easy-to-use, and aesthetically pleasing dashboard using a dataset of New York plant and animal biodiversity. A sub-goal of the project is to have something all of us can add to our data science portfolios. In other words, we want to be able to confidently present the final product to potential employers.
+The main goal of the project is to build a functional, easy-to-use, and aesthetically pleasing dashboard using a dataset of Vancouver crime data. A sub-goal of the project is to have something all of us can add to our data science portfolios. In other words, we want to be able to confidently present the final product to potential employers.
 
 The main obstacle for the project will be managing the workload with the other courses in the MDS program. In between quizzes and other projects, it will sometimes be difficult to find time for this assignment. That's why it's important the team knows how to work together effectively. We have decided that the easiest way to do this is to delegate work to each other clearly and with full consent from who the work is being delegated to. This will help us ensure the work is distributed fairly and evenly. This process will be explained in more detail in the 'Work Norms' section below.
 
