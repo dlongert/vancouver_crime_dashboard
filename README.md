@@ -27,6 +27,8 @@ This persona description is a good example of the types of research questions a 
 ## Sketch:
 ![my sketch image](image_folder/s.png)
 
+![my sketch image](image_folder/s_2.png)
+
 ## First Page: Temporal Analysis of Crime
 At the top of the first page, users are greeted with dropdown boxes labeled "year," "month," "day," and "type of crime". These filters allow for precise data navigation. Below these, the statistics are displayed, offering insights such as the count of crimes on a specific day, or the average daily crime rate when a year or month is selected. The second column presents the annual total number of crimes, while the third column highlights the neighborhood with the highest crime rate for the current year. 
 
