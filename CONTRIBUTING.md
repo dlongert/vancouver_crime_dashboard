@@ -2,18 +2,18 @@
 
 # How to contribute
 
-Welcome to our biodiversity database app! This document explains how you can contribute to this project and provides some guidelines for good behaviour
+Welcome to our Vancouver Crime database app! This document explains how you can contribute to this project and provides some guidelines for good behaviour
 
 Here are some links to important resources related to this project:
 
-  * [Code of Conduct](https://github.com/dlongert/dashboard_project/invitations) sets standards for good behaviour within our community,
-  * [Dataset description](https://catalog.data.gov/dataset/biodiversity-by-county-distribution-of-animals-plants-and-natural-communities) is the source of the dataset used to build this app.
+  * [Code of Conduct](https://github.com/dlongert/vancouver_crime_dashboard?tab=coc-ov-file) sets standards for good behaviour within our community,
+  * [Dataset description](https://www.kaggle.com/datasets/wosaku/crime-in-vancouver) is the source of the dataset used to build this app.
 
 ## Submitting changes
 
 Please write clear and concise messages for all of your commits. They don't need to be long messages, but they should include who made the commit, what file(s) the commit was made on, and briefly state what the changes were. Here's a simple example:
 
-    $ git commit -m "Demeter edited the code of conduct to include a section on how to introduce new members of the team."
+    $ git commit -m "Ares edited the code of conduct to include a section on how to introduce new members of the team."
 
 ## Coding conventions
 
