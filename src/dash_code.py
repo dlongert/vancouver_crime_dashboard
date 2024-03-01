@@ -54,7 +54,7 @@ app.layout = dbc.Container([
         ],
         label='Vancouver Geography'),
             
-        dbc.Tab('Some other text', label='Tab two')])])
+        dbc.Tab("KATO AND TOMMY'S SIDE OF THE DASH", label='Tab two')])])
 
 @app.callback(
     Output('neighbourhood-chart', 'srcDoc'),
