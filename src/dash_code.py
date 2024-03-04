@@ -60,7 +60,7 @@ def crimes_by_season(selected_crime_types):
 
 def crimes_by_day(selected_crime_types):
     filtered_crime = crime[crime['TYPE'].isin(selected_crime_types)]
-    chart = alt.Chart(filtered_crime).mark_bar().encode(
+    chart = alt.Chart(filtered_crime).mark_point().encode(  # Changed from mark_bar to mark_point
         x='DAY:O',
         y='count():Q',
         color='TYPE:N',
