@@ -50,13 +50,13 @@ def crimes_by_year(selected_crime_types):
 
 def crimes_by_season(selected_crime_types):
     filtered_crime = crime[crime['TYPE'].isin(selected_crime_types)]
-    chart = alt.Chart(filtered_crime).mark_bar().encode(
+    chart = alt.Chart(filtered_crime).mark_line(point=True).encode(
         x='SEASON:N',
         y='count():Q',
         color='TYPE:N',
         tooltip=['SEASON', 'count()']
     ).properties(title='Number of Crimes by Season')
-    return chart.to_html()
+    return chart.to_html() 
 
 def crimes_by_day(selected_crime_types):
     filtered_crime = crime[crime['TYPE'].isin(selected_crime_types)]
