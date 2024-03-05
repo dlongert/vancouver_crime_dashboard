@@ -154,9 +154,15 @@ app.layout = dbc.Container([
                     options=[{'label': crime_type, 'value': crime_type} for crime_type in crime["TYPE"].unique()],
                     value=[crime["TYPE"].unique()[0]],
                     multi=True),
-                html.Iframe(id='year-chart', style={'border-width': '0', 'width': '100%', 'height': '400px'}),
-                html.Iframe(id='season-chart', style={'border-width': '0', 'width': '100%', 'height': '400px'}),
-                html.Iframe(id='day-chart', style={'border-width': '0', 'width': '100%', 'height': '400px'})
+                html.Div([
+                    html.Div([
+                        html.Iframe(id='year-chart', style={'border-width': '0', 'width': '100%', 'height': '400px', 'textAlign': 'center'}),
+                    ], style={'textAlign': 'center'}),
+                    html.Div([
+                        html.Iframe(id='season-chart', style={'border-width': '0', 'width': '50%', 'height': '400px', 'display': 'inline-block'}),
+                        html.Iframe(id='day-chart', style={'border-width': '0', 'width': '50%', 'height': '400px', 'display': 'inline-block'})
+                    ], style={'textAlign': 'center'})
+                ]),
             ], style={'marginTop': 50}),
         ], 
         label='Vancouver Temporal Crime')
