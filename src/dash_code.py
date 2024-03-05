@@ -1,13 +1,16 @@
 import pandas as pd
 import altair as alt
+import vegafusion as vf
 import plotly.graph_objects as go
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 
+# vf.enable()
 crime = pd.read_csv("data/processed/crime_processed.csv")
-crime = crime.loc[1:500]
+crime = crime.dropna()
+crime = crime.loc[1:5000]
 crime['DATE'] = pd.to_datetime(crime[['YEAR', 'MONTH', 'DAY']])
 
 # map plot
