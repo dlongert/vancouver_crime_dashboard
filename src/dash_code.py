@@ -23,7 +23,7 @@ map_trace = go.Scattermapbox(
 )
 
 layout = go.Layout(
-    title='<b>Map of Vancouver</b>',
+    title='<b>Vancouver City Map</b>',
     title_x=0.5,
     title_y=0.9,
     title_font=dict(size=24),
@@ -43,7 +43,7 @@ def neighbourhood_crime_plot(selected_neighbourhoods):
     chart = alt.Chart(filtered_crime).mark_bar().encode(
         alt.X("count()", title="Number of crimes by neighbourhood"),
         alt.Y("NEIGHBOURHOOD", title="Neighbourhood")
-    ).properties(title="Crimes in Vancouver Neighbourhoods", height=200, width=200)
+    ).properties(title="Number of Crimes by Neighbourhood", height=200, width=200)
     return chart.to_html()
 
 def street_crime_plot(selected_crime_types):
@@ -54,7 +54,7 @@ def street_crime_plot(selected_crime_types):
     filtered_crime = filtered_crime[filtered_crime['HUNDRED_BLOCK'].isin(top_streets)]   
     chart = alt.Chart(filtered_crime).mark_bar().encode(
         alt.X("HUNDRED_BLOCK", title=None),
-        alt.Y("count()", title="Number of crimes per street")
+        alt.Y("count()", title="Top 5 Most Dangerous Streets")
     ).properties(title="Crimes on Vancouver Streets", height=200, width=200)
     return chart.to_html()
 
