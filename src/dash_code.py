@@ -41,7 +41,7 @@ fig = go.Figure(data=map_trace, layout=layout)
 def neighbourhood_crime_plot(selected_neighbourhoods):
     filtered_crime = crime[crime['NEIGHBOURHOOD'].isin(selected_neighbourhoods)]
     chart = alt.Chart(filtered_crime).mark_bar().encode(
-        alt.X("count()", title="Number of crimes by neighbourhood"),
+        alt.X("count()", title="Number of Crimes"),
         alt.Y("NEIGHBOURHOOD", title="Neighbourhood")
     ).properties(title="Number of Crimes by Neighbourhood", height=200, width=200)
     return chart.to_html()
@@ -54,8 +54,8 @@ def street_crime_plot(selected_crime_types):
     filtered_crime = filtered_crime[filtered_crime['HUNDRED_BLOCK'].isin(top_streets)]   
     chart = alt.Chart(filtered_crime).mark_bar().encode(
         alt.X("HUNDRED_BLOCK", title=None),
-        alt.Y("count()", title="Top 5 Most Dangerous Streets")
-    ).properties(title="Crimes on Vancouver Streets", height=200, width=200)
+        alt.Y("count()", title="Number of Crimes")
+    ).properties(title="Top 5 Streets by Number of Crimes", height=200, width=200)
     return chart.to_html()
 
 def map_month_to_season(month):
