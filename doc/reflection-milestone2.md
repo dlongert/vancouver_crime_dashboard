@@ -12,7 +12,7 @@ In the temporal analysis of crime tab, we've crafted interactive charts that she
 
 ## What We Want to Add
 
-The biggest addition we want to make to the geographic analysis of crime tab is adding more functionality to the map showing where crimes have occurred. The dataset contains longitude and latitude coordinates, so we are wondering if it is possible to show exact locations of all crimes selected by filters. This is probably the toughest feature in the dashboard to implement, so we will have to experiment with it for the next milestone.
+For each of the tabs, we can only run the data with the first 5000 observations from the dataset, due to altairs limitations. Going forward, we will be looking into methods which will enable us to utilize the entire dataset. The biggest addition we want to make to the geographic analysis of crime tab is adding more functionality to the map showing where crimes have occurred. The dataset contains longitude and latitude coordinates, so we are wondering if it is possible to show exact locations of all crimes selected by filters. This is probably the toughest feature in the dashboard to implement, so we will have to experiment with it for the next milestone.
 
 On the temporal analysis of crime tab, we want to change the crimes by day graph to a line graph, which will better show trends as crime changes over time. We also want to add more years to the tab because it is only displaying 2003 right now. This will take some problem-solving because the number of years in the dataset (15) will create clutter.
 
