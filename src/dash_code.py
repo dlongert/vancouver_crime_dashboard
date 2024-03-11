@@ -8,9 +8,10 @@ from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 
 # vf.enable()
+alt.data_transformers.disable_max_rows()
 crime = pd.read_csv("data/processed/crime_processed.csv")
 crime = crime.dropna()
-crime = crime.loc[1:5000]
+# crime = crime.sample(n = 5000, replace = False)
 crime['DATE'] = pd.to_datetime(crime[['YEAR', 'MONTH', 'DAY']])
 
 # map plot
@@ -48,6 +49,7 @@ def neighbourhood_crime_plot(selected_neighbourhoods):
         alt.Y("NEIGHBOURHOOD", title="Neighbourhood")
     ).properties(title="Number of Crimes by Neighbourhood", height=200, width=200)
     return chart.to_html()
+    
 
 def street_crime_plot(selected_crime_types):
     filtered_crime = crime[crime['TYPE'].isin(selected_crime_types)]
@@ -76,8 +78,8 @@ crime['SEASON'] = crime['MONTH'].apply(map_month_to_season)
 def crimes_by_year(selected_crime_types):
     filtered_crime = crime[crime['TYPE'].isin(selected_crime_types)]
     chart = alt.Chart(filtered_crime).mark_bar().encode(
-        x='YEAR:O',
-        y='count():Q',
+        alt.X('YEAR:O', title = None),
+        alt.Y('count():Q', title = "Number of Crimes"),
         color='TYPE:N',
         tooltip=['YEAR', 'count()']
     ).properties(title='Number of Crimes by Year')
@@ -86,28 +88,29 @@ def crimes_by_year(selected_crime_types):
 def crimes_by_season(selected_crime_types):
     filtered_crime = crime[crime['TYPE'].isin(selected_crime_types)]
     chart = alt.Chart(filtered_crime).mark_line(point=True).encode(
-        x='SEASON:N',
-        y='count():Q',
+        alt.X('SEASON:N', title = None),
+        alt.Y('count():Q', title = "Number of Crimes"),
         color='TYPE:N',
         tooltip=['SEASON', 'count()']
-    ).properties(title='Number of Crimes by Season')
+    ).properties(title='Number of Crimes by Season', width = 400, height = 300)
     return chart.to_html() 
 
 def crimes_by_day(selected_crime_types):
     filtered_crime = crime[crime['TYPE'].isin(selected_crime_types)]
     chart = alt.Chart(filtered_crime).mark_point().encode(
-        x='DAY:O',
-        y='count():Q',
+        alt.X('DAY:O', title = "Day"),
+        alt.Y('count():Q', title = "Number of Crimes"),
         color='TYPE:N',
         tooltip=['DAY', 'count()']
     ).properties(title='Number of Crimes by Day')
     return chart.to_html()
 
+
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.layout = dbc.Container([
     dbc.Tabs([
         dbc.Tab([
-            html.P('Geographic Analysis of Crime in Vancouver', style={'color': 'red', 'fontSize': 44, 'textAlign': 'center'}),
+            html.Div('Geographic Analysis of Crime in Vancouver', style={'color': 'red', 'fontSize': 44, 'textAlign': 'center'}),
             html.Div([
                 dbc.Container(
                     dbc.Row(
@@ -130,7 +133,7 @@ app.layout = dbc.Container([
                         ], style={'textAlign': 'center'}),
                         html.Iframe(id='neighbourhood-chart',
                                     srcDoc=neighbourhood_crime_plot([crime["NEIGHBOURHOOD"].unique()[i] for i in range(5)]),
-                                    style={'border-width': '0', 'width': '100%', 'height': '400px'})
+                                    style={'borderWidth': '0', 'width': '100%', 'height': '400px'})
                     ], width=6),
                     dbc.Col([
                         html.Label('Select Crime Type:'),
@@ -141,7 +144,7 @@ app.layout = dbc.Container([
                             multi=True),
                         html.Iframe(id='street-chart',
                                     srcDoc=street_crime_plot([crime["TYPE"].unique()[2]]),
-                                    style={'border-width': '0', 'width': '100%', 'height': '400px'})
+                                    style={'borderWidth': '0', 'width': '100%', 'height': '400px'})
                     ], width=6)
                 ], style={'marginTop': 50})
             ])
@@ -149,8 +152,8 @@ app.layout = dbc.Container([
         label='Vancouver Geography'),
             
         dbc.Tab([
-            html.P('Temporal Analysis of Crime in Vancouver', style={'color': 'blue', 'fontSize': 44, 'textAlign': 'center'}),
-            html.P([
+            html.Div('Temporal Analysis of Crime in Vancouver', style={'color': 'blue', 'fontSize': 44, 'textAlign': 'center'}),
+            html.Div([
                 html.Label('Select Crime Type:'),
                 dcc.Dropdown(
                     id='crime-type-dropdown',
@@ -159,11 +162,11 @@ app.layout = dbc.Container([
                     multi=True),
                 html.Div([
                     html.Div([
-                        html.Iframe(id='year-chart', style={'border-width': '0', 'width': '100%', 'height': '400px', 'textAlign': 'center'}),
+                        html.Iframe(id='year-chart', style={'borderWidth': '0', 'width': '100%', 'height': '400px', 'textAlign': 'center'}),
                     ], style={'textAlign': 'center'}),
                     html.Div([
-                        html.Iframe(id='season-chart', style={'border-width': '0', 'width': '50%', 'height': '400px', 'display': 'inline-block'}),
-                        html.Iframe(id='day-chart', style={'border-width': '0', 'width': '50%', 'height': '400px', 'display': 'inline-block'})
+                        html.Iframe(id='season-chart', style={'borderWidth': '0', 'width': '50%', 'height': '400px', 'display': 'inline-block'}),
+                        html.Iframe(id='day-chart', style={'borderWidth': '0', 'width': '50%', 'height': '400px', 'display': 'inline-block'})
                     ], style={'textAlign': 'center'})
                 ]),
             ], style={'marginTop': 50}),
@@ -171,6 +174,7 @@ app.layout = dbc.Container([
         label='Vancouver Temporal Crime')
     ])
 ])
+
 
 @app.callback(
     [Output('neighbourhood-chart', 'srcDoc'),
@@ -192,3 +196,4 @@ def update_charts(selected_neighbourhoods, selected_crime_types, selected_crime_
 
 if __name__ == '__main__':
     app.run_server(debug=True)
+
