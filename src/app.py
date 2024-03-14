@@ -107,6 +107,7 @@ def crimes_by_day(selected_crime_types):
 
 
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
 app.layout = dbc.Container([
     dbc.Tabs([
         dbc.Tab([
