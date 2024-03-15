@@ -1,17 +1,17 @@
 import pandas as pd
 import altair as alt
-import vegafusion as vf
 import plotly.graph_objects as go
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
+from collections import Counter
 
-# vf.enable()
 alt.data_transformers.disable_max_rows()
 crime = pd.read_csv("data/processed/crime_processed.csv")
 crime = crime.dropna()
-crime = crime.sample(n = 5000, replace = False)
+# crime = crime.sample(n=5000, replace=False)
+crime["HUNDRED_BLOCK"] = crime["HUNDRED_BLOCK"].str.replace("\d*X+ ", "", regex=True)
 crime['DATE'] = pd.to_datetime(crime[['YEAR', 'MONTH', 'DAY']])
 
 # map plot
@@ -52,14 +52,13 @@ def neighbourhood_crime_plot(selected_neighbourhoods):
         alt.Y("NEIGHBOURHOOD", title="Neighbourhood", sort='x')
     ).properties(title="Number of Crimes by Neighbourhood", height=200, width=200)
     return chart.to_html()
-    
 
 def street_crime_plot(selected_crime_types):
     filtered_crime = crime[crime['TYPE'].isin(selected_crime_types)]
-    street_counts = filtered_crime['HUNDRED_BLOCK'].value_counts().reset_index()
-    street_counts.columns = ['HUNDRED_BLOCK', 'count']
-    top_streets = street_counts.sort_values(by='count', ascending=False).head(5)['HUNDRED_BLOCK']  
-    filtered_crime = filtered_crime[filtered_crime['HUNDRED_BLOCK'].isin(top_streets)]   
+    street_counts = filtered_crime['HUNDRED_BLOCK'].str.replace("\d*X+ ", "", regex=True).value_counts().reset_index()
+    street_counts.columns = ['STREET_NAME', 'count']
+    top_streets = street_counts.sort_values(by='count', ascending=False).head(5)['STREET_NAME']
+    filtered_crime = filtered_crime[filtered_crime['HUNDRED_BLOCK'].str.replace("\d*X+ ", "", regex=True).isin(top_streets)]
     chart = alt.Chart(filtered_crime).mark_bar().encode(
         alt.X("count()", title="Number of Crimes"),
         alt.Y("HUNDRED_BLOCK", title=None, sort='x')
@@ -76,7 +75,7 @@ def map_month_to_season(month):
     elif month in [9, 10, 11]:
         return 'Fall'
 
-crime['SEASON'] = crime['MONTH'].apply(map_month_to_season) 
+crime['SEASON'] = crime['MONTH'].apply(map_month_to_season)
 
 def crimes_by_year(selected_years_range, selected_crime_types):
     filtered_crime = crime[(crime['YEAR'] >= selected_years_range[0]) & (crime['YEAR'] <= selected_years_range[1])]
@@ -92,36 +91,51 @@ def crimes_by_year(selected_years_range, selected_crime_types):
 def crimes_by_season(selected_crime_types):
     filtered_crime = crime[crime['TYPE'].isin(selected_crime_types)]
     chart = alt.Chart(filtered_crime).mark_line(point=True).encode(
-        alt.X('SEASON:N', title = None),
-        alt.Y('count():Q', title = "Number of Crimes"),
+        alt.X('SEASON:N', title=None),
+        alt.Y('count():Q', title="Number of Crimes"),
         color='TYPE:N',
         tooltip=['SEASON', 'count()']
-    ).properties(title='Number of Crimes by Season', width = 400, height = 300)
-    return chart.to_html() 
+    ).properties(title='Number of Crimes by Season', width=400, height=300)
+    return chart.to_html()
 
 def crimes_by_day(selected_crime_types):
     filtered_crime = crime[crime['TYPE'].isin(selected_crime_types)]
     chart = alt.Chart(filtered_crime).mark_point().encode(
-        alt.X('DAY:O', title = "Day"),
-        alt.Y('count():Q', title = "Number of Crimes"),
+        alt.X('DAY:O', title="Day"),
+        alt.Y('count():Q', title="Number of Crimes"),
         color='TYPE:N',
         tooltip=['DAY', 'count()']
     ).properties(title='Number of Crimes by Day')
     return chart.to_html()
 
-
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
+
 app.layout = dbc.Container([
     dbc.Tabs([
         dbc.Tab([
             html.Div('Geographic Analysis of Crime in Vancouver', style={'color': 'red', 'fontSize': 44, 'textAlign': 'center'}),
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.H3('Most Dangerous Vancouver Neighbourhood:', style={'fontSize': 24, 'textAlign': 'center'}),
+                        html.H4(id='most_dangerous_neighbourhood', style={'color': 'blue', 'fontSize': 24, 'textAlign': 'center'}),
+                    ])
+                ], width=6),
+                dbc.Col([
+                    html.Div([
+                        html.H3('Most Dangerous Vancouver Street:', style={'fontSize': 24, 'textAlign': 'center'}),
+                        html.H4(id='most_dangerous_street', style={'color': 'blue','fontSize': 24, 'textAlign': 'center'}),
+                    ])
+                ], width=6)
+            ], style={'margin': 'auto', 'width': '80%', 'marginTop': '20px'}),
             html.Div([
                 dbc.Container([
                     dbc.Row([
                         dbc.Col(
-                            html.Label('Select Crime Type:'),
-                            width={'size': 10, 'offset': 1}
+                            html.Label('Select Crime Type:', style={'textAlign': 'center'}),
+                            width={'size': 10, 'offset': 2},
+                            style={'marginTop': '20px'} 
                         ),
                         dbc.Col(
                             dcc.Dropdown(
@@ -129,7 +143,8 @@ app.layout = dbc.Container([
                                 options=[{'label': crime_type, 'value': crime_type} for crime_type in crime["TYPE"].unique()],
                                 value=[crime["TYPE"].unique()[2]],
                                 multi=True),
-                            width={'size': 10, 'offset': 1}
+                                width={'size': 7, 'offset': 2},
+                                style={'textAlign': 'center'}
                         ),
                     ]),
                     dbc.Row([
@@ -155,12 +170,11 @@ app.layout = dbc.Container([
                                     style={'borderWidth': '0', 'width': '100%', 'height': '400px'})
                     ], width=6),
                     dbc.Col([
-                        html.Label('Select Crime Type:'),
+                        html.Label('Select Crime Type:', style={'textAlign': 'center'}),
                         dcc.Dropdown(
                             id='crime-type-dropdown-db',
                             options=[{'label': crime_type, 'value': crime_type} for crime_type in crime["TYPE"].unique()],
-                            value=[crime["TYPE"].unique()[2]],
-                            multi=True),
+                            value=[crime["TYPE"].unique()[2]], multi=True),
                         html.Iframe(id='street-chart',
                                     srcDoc=street_crime_plot([crime["TYPE"].unique()[2]]),
                                     style={'borderWidth': '0', 'width': '100%', 'height': '400px'})
@@ -169,7 +183,7 @@ app.layout = dbc.Container([
             ])
         ],
         label='Vancouver Geography'),
-            
+
         dbc.Tab([
             html.Div('Temporal Analysis of Crime in Vancouver', style={'color': 'blue', 'fontSize': 44, 'textAlign': 'center'}),
             html.Div([
@@ -179,7 +193,8 @@ app.layout = dbc.Container([
                     options=[{'label': crime_type, 'value': crime_type} for crime_type in crime["TYPE"].unique()],
                     value=[crime["TYPE"].unique()[0]],
                     multi=True),
-                html.Label('Select Year:'),
+                html.Label('Select Year:', style = {'marginTop': 50}),
+                html.Div(
                 dcc.RangeSlider(
                     id='year-slider',
                     min=min(crime['YEAR']),
@@ -188,6 +203,8 @@ app.layout = dbc.Container([
                     marks={str(year): str(year) for year in range(min(crime['YEAR']), max(crime['YEAR']) + 1)},
                     step=None
                 ),
+                style={'width': '50%', 'textAlign': 'center'}
+    ),
                 html.Div([
                     html.Div([
                         html.Iframe(id='year-chart', style={'borderWidth': '0', 'width': '100%', 'height': '400px', 'textAlign': 'center'}),
@@ -198,7 +215,7 @@ app.layout = dbc.Container([
                     ], style={'textAlign': 'center'})
                 ]),
             ], style={'marginTop': 50}),
-        ], 
+        ],
         label='Vancouver Temporal Crime')
     ])
 ])
@@ -210,7 +227,9 @@ app.layout = dbc.Container([
      Output('street-chart', 'srcDoc'),
      Output('year-chart', 'srcDoc'),
      Output('season-chart', 'srcDoc'),
-     Output('day-chart', 'srcDoc')],
+     Output('day-chart', 'srcDoc'),
+     Output('most_dangerous_neighbourhood', 'children'),
+     Output('most_dangerous_street', 'children')],
     [Input('crime-type-map-dropdown-db', 'value'),
      Input('neighbourhood-dropdown', 'value'),
      Input('year-slider', 'value'),
@@ -224,7 +243,7 @@ def update_data(selected_crime_types_map, selected_neighbourhoods, selected_year
     filtered_data_year = crime[(crime['YEAR'] >= selected_years_range[0]) & (crime['YEAR'] <= selected_years_range[1])]
     filtered_data_db = crime[crime['TYPE'].isin(selected_crime_types_db)]
     filtered_data_temporal = crime[crime['TYPE'].isin(selected_crime_types_temporal)]
-    
+
     # Update heatmap figure
     heatmap_trace = go.Densitymapbox(
         lat=filtered_data_map['Latitude'],
@@ -258,7 +277,16 @@ def update_data(selected_crime_types_map, selected_neighbourhoods, selected_year
     season_html = crimes_by_season(selected_crime_types_temporal)
     day_html = crimes_by_day(selected_crime_types_temporal)
 
-    return updated_fig, neighbourhood_html, street_html, year_html, season_html, day_html
+    # Calculate the most dangerous Vancouver neighbourhood
+    most_dangerous_neighbourhood = Counter(filtered_data_neighbourhood['NEIGHBOURHOOD']).most_common(1)[0][0]
+
+    # Calculate the most dangerous Vancouver street
+    most_dangerous_street = Counter(filtered_data_db['HUNDRED_BLOCK']).most_common(1)[0][0]
+
+    return (updated_fig, neighbourhood_html, street_html, year_html, season_html, day_html,
+            most_dangerous_neighbourhood,
+            most_dangerous_street)
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
