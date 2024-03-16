@@ -1,5 +1,6 @@
 import pandas as pd
 import altair as alt
+import calendar
 import plotly.graph_objects as go
 import dash
 from dash import dcc, html
@@ -49,7 +50,8 @@ def neighbourhood_crime_plot(selected_neighbourhoods):
     filtered_crime = crime[crime['NEIGHBOURHOOD'].isin(selected_neighbourhoods)]
     chart = alt.Chart(filtered_crime).mark_bar().encode(
         alt.X("count()", title="Number of Crimes"),
-        alt.Y("NEIGHBOURHOOD", title="Neighbourhood", sort='x')
+        alt.Y("NEIGHBOURHOOD", title="Neighbourhood", sort='x'),
+        tooltip=["NEIGHBOURHOOD", 'count()']
     ).properties(title="Number of Crimes by Neighbourhood", height=300, width=400)
     return chart.to_html()
 
@@ -61,7 +63,8 @@ def street_crime_plot(selected_crime_types):
     filtered_crime = filtered_crime[filtered_crime['HUNDRED_BLOCK'].str.replace("\d*X+ ", "", regex=True).isin(top_streets)]
     chart = alt.Chart(filtered_crime).mark_bar().encode(
         alt.X("count()", title="Number of Crimes"),
-        alt.Y("HUNDRED_BLOCK", title=None, sort='x')
+        alt.Y("HUNDRED_BLOCK", title=None, sort='x'),
+        tooltip=["HUNDRED_BLOCK", 'count()']
     ).properties(title="Top 5 Streets by Number of Crimes", height=300, width=400)
     return chart.to_html()
 
@@ -76,12 +79,13 @@ def map_month_to_season(month):
         return 'Fall'
 
 crime['SEASON'] = crime['MONTH'].apply(map_month_to_season)
+crime['MONTH'] = crime['MONTH'].apply(lambda x: calendar.month_name[x])
 
 def crimes_by_year(selected_years_range, selected_crime_types):
     filtered_crime = crime[(crime['YEAR'] >= selected_years_range[0]) & (crime['YEAR'] <= selected_years_range[1])]
     filtered_crime = filtered_crime[filtered_crime['TYPE'].isin(selected_crime_types)]
     chart = alt.Chart(filtered_crime).mark_bar().encode(
-        alt.X('YEAR:O', title=None),
+        alt.X('YEAR:O', title=None,  axis=alt.Axis(labelAngle=45)),
         alt.Y('count():Q', title="Number of Crimes"),
         color='TYPE:N',
         tooltip=['YEAR', 'count()']
@@ -92,22 +96,23 @@ def crimes_by_season(selected_years_range, selected_crime_types):
     filtered_crime = crime[(crime['YEAR'].between(selected_years_range[0], selected_years_range[1])) & 
                            (crime['TYPE'].isin(selected_crime_types))]
     chart = alt.Chart(filtered_crime).mark_line(point=True).encode(
-        alt.X('SEASON:N', title=None),
+        alt.X('SEASON:N', title=None,  axis=alt.Axis(labelAngle=0)),
         alt.Y('count():Q', title="Number of Crimes"),
         color='TYPE:N',
         tooltip=['SEASON', 'count()']
     ).properties(title='Number of Crimes by Season', height=300, width=400)
     return chart.to_html()
 
-def crimes_by_day(selected_years_range, selected_crime_types):
+def crimes_by_day(selected_years_range, selected_crime_types, selected_month):
     filtered_crime = crime[(crime['YEAR'].between(selected_years_range[0], selected_years_range[1])) & 
-                           (crime['TYPE'].isin(selected_crime_types))]
+                           (crime['TYPE'].isin(selected_crime_types)) &
+                           (crime['MONTH'] == selected_month)]
     chart = alt.Chart(filtered_crime).mark_point().encode(
-        alt.X('DAY:O', title="Day"),
+        alt.X('DAY:O', title="Day", axis=alt.Axis(labelAngle=0)),
         alt.Y('count():Q', title="Number of Crimes"),
         color='TYPE:N',
         tooltip=['DAY', 'count()']
-    ).properties(title='Number of Crimes by Day')
+    ).properties(title=f'Number of Crimes in {selected_month}', height=300, width=500)
     return chart.to_html()
 
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -195,33 +200,43 @@ app.layout = dbc.Container([
                     options=[{'label': crime_type, 'value': crime_type} for crime_type in crime["TYPE"].unique()],
                     value=[crime["TYPE"].unique()[0]],
                     multi=True),
-                html.Label('Select Year:', style = {'marginTop': 50}),
+                html.Label('Select Year:', style={'marginTop': 50}),
                 html.Div(
-                dcc.RangeSlider(
-                    id='year-slider',
-                    min=min(crime['YEAR']),
-                    max=max(crime['YEAR']),
-                    value=[min(crime['YEAR']), max(crime['YEAR'])],
-                    marks={str(year): str(year) for year in range(min(crime['YEAR']), max(crime['YEAR']) + 1)},
-                    step=None
-                ),
-                style={'width': '50%', 'textAlign': 'center'}
+                    dcc.RangeSlider(
+                        id='year-slider',
+                        min=min(crime['YEAR']),
+                        max=max(crime['YEAR']),
+                        value=[min(crime['YEAR']), max(crime['YEAR'])],
+                        marks={str(year): str(year) for year in range(min(crime['YEAR']), max(crime['YEAR']) + 1)},
+                        step=None
+                    ),
+                    style={'width': '50%', 'textAlign': 'center'}
                 ),
                 html.Div([
                     html.Div([
                         html.Iframe(id='year-chart', style={'borderWidth': '0', 'width': '100%', 'height': '400px', 'textAlign': 'center'}),
-                    ], style={'textAlign': 'center'}),
+                    ]),
                     html.Div([
                         html.Iframe(id='season-chart', style={'borderWidth': '0', 'width': '50%', 'height': '400px', 'display': 'inline-block'}),
                         html.Iframe(id='day-chart', style={'borderWidth': '0', 'width': '50%', 'height': '400px', 'display': 'inline-block'})
-                    ], style={'textAlign': 'center'})
+                    ], style={'display': 'flex'}),
+                    html.Div([
+                        html.Div([
+                            html.Label('Select Month:', style={'marginTop': '20px'}),
+                        ], style={'textAlign': 'center'}),
+                        dcc.Dropdown(
+                            id='month-dropdown',
+                            options=[{'label': calendar.month_name[i], 'value': calendar.month_name[i]} for i in range(1, 13)],
+                            value='January',
+                            style={'width': '50%', 'margin-left': '5px', 'margin-right': '0'}
+                        ),
+                    ], style={'textAlign': 'center', 'width': '100%', 'display': 'flex', 'justifyContent': 'flex-end'})
                 ]),
             ], style={'marginTop': 50}),
         ],
-        label='Vancouver Temporal Crime')
+            label='Vancouver Temporal Crime')
     ])
 ])
-
 
 @app.callback(
     [Output('crime-heatmap', 'figure'),
@@ -283,13 +298,14 @@ def update_data_geographic(selected_crime_types_map, selected_neighbourhoods):
      Output('season-chart', 'srcDoc'),
      Output('day-chart', 'srcDoc')],
     [Input('year-slider', 'value'),
-     Input('crime-type-dropdown', 'value')])
+     Input('crime-type-dropdown', 'value'),
+     Input('month-dropdown', 'value')])
 
-def update_data_temporal(selected_years_range, selected_crime_types_temporal):
+def update_data_temporal(selected_years_range, selected_crime_types_temporal, selected_month):
     # Filter data based on selected inputs
     year_html = crimes_by_year(selected_years_range, selected_crime_types_temporal)
     season_html = crimes_by_season(selected_years_range, selected_crime_types_temporal)
-    day_html = crimes_by_day(selected_years_range, selected_crime_types_temporal)
+    day_html = crimes_by_day(selected_years_range, selected_crime_types_temporal, selected_month)
     return (year_html, season_html, day_html)
 
 
