@@ -50,7 +50,7 @@ def neighbourhood_crime_plot(selected_neighbourhoods):
     chart = alt.Chart(filtered_crime).mark_bar().encode(
         alt.X("count()", title="Number of Crimes"),
         alt.Y("NEIGHBOURHOOD", title="Neighbourhood", sort='x')
-    ).properties(title="Number of Crimes by Neighbourhood", height=200, width=200)
+    ).properties(title="Number of Crimes by Neighbourhood", height=300, width=400)
     return chart.to_html()
 
 def street_crime_plot(selected_crime_types):
@@ -62,7 +62,7 @@ def street_crime_plot(selected_crime_types):
     chart = alt.Chart(filtered_crime).mark_bar().encode(
         alt.X("count()", title="Number of Crimes"),
         alt.Y("HUNDRED_BLOCK", title=None, sort='x')
-    ).properties(title="Top 5 Streets by Number of Crimes", height=200, width=200)
+    ).properties(title="Top 5 Streets by Number of Crimes", height=300, width=400)
     return chart.to_html()
 
 def map_month_to_season(month):
@@ -85,21 +85,23 @@ def crimes_by_year(selected_years_range, selected_crime_types):
         alt.Y('count():Q', title="Number of Crimes"),
         color='TYPE:N',
         tooltip=['YEAR', 'count()']
-    ).properties(title='Number of Crimes by Year')
+    ).properties(title='Number of Crimes by Year', height=300, width=400)
     return chart.to_html()
 
-def crimes_by_season(selected_crime_types):
-    filtered_crime = crime[crime['TYPE'].isin(selected_crime_types)]
+def crimes_by_season(selected_years_range, selected_crime_types):
+    filtered_crime = crime[(crime['YEAR'].between(selected_years_range[0], selected_years_range[1])) & 
+                           (crime['TYPE'].isin(selected_crime_types))]
     chart = alt.Chart(filtered_crime).mark_line(point=True).encode(
         alt.X('SEASON:N', title=None),
         alt.Y('count():Q', title="Number of Crimes"),
         color='TYPE:N',
         tooltip=['SEASON', 'count()']
-    ).properties(title='Number of Crimes by Season', width=400, height=300)
+    ).properties(title='Number of Crimes by Season', height=300, width=400)
     return chart.to_html()
 
-def crimes_by_day(selected_crime_types):
-    filtered_crime = crime[crime['TYPE'].isin(selected_crime_types)]
+def crimes_by_day(selected_years_range, selected_crime_types):
+    filtered_crime = crime[(crime['YEAR'].between(selected_years_range[0], selected_years_range[1])) & 
+                           (crime['TYPE'].isin(selected_crime_types))]
     chart = alt.Chart(filtered_crime).mark_point().encode(
         alt.X('DAY:O', title="Day"),
         alt.Y('count():Q', title="Number of Crimes"),
@@ -204,7 +206,7 @@ app.layout = dbc.Container([
                     step=None
                 ),
                 style={'width': '50%', 'textAlign': 'center'}
-    ),
+                ),
                 html.Div([
                     html.Div([
                         html.Iframe(id='year-chart', style={'borderWidth': '0', 'width': '100%', 'height': '400px', 'textAlign': 'center'}),
@@ -225,24 +227,16 @@ app.layout = dbc.Container([
     [Output('crime-heatmap', 'figure'),
      Output('neighbourhood-chart', 'srcDoc'),
      Output('street-chart', 'srcDoc'),
-     Output('year-chart', 'srcDoc'),
-     Output('season-chart', 'srcDoc'),
-     Output('day-chart', 'srcDoc'),
      Output('most_dangerous_neighbourhood', 'children'),
      Output('most_dangerous_street', 'children')],
     [Input('crime-type-map-dropdown-db', 'value'),
-     Input('neighbourhood-dropdown', 'value'),
-     Input('year-slider', 'value'),
-     Input('crime-type-dropdown-db', 'value'),
-     Input('crime-type-dropdown', 'value')])
+     Input('neighbourhood-dropdown', 'value')])
 
-def update_data(selected_crime_types_map, selected_neighbourhoods, selected_years_range, selected_crime_types_db, selected_crime_types_temporal):
+def update_data_geographic(selected_crime_types_map, selected_neighbourhoods):
     # Filter data based on selected inputs
     filtered_data_map = crime[crime['TYPE'].isin(selected_crime_types_map)]
     filtered_data_neighbourhood = crime[crime['NEIGHBOURHOOD'].isin(selected_neighbourhoods)]
-    filtered_data_year = crime[(crime['YEAR'] >= selected_years_range[0]) & (crime['YEAR'] <= selected_years_range[1])]
-    filtered_data_db = crime[crime['TYPE'].isin(selected_crime_types_db)]
-    filtered_data_temporal = crime[crime['TYPE'].isin(selected_crime_types_temporal)]
+    filtered_data_db = crime[crime['TYPE'].isin(selected_crime_types_map)]
 
     # Update heatmap figure
     heatmap_trace = go.Densitymapbox(
@@ -272,10 +266,7 @@ def update_data(selected_crime_types_map, selected_neighbourhoods, selected_year
 
     # Update other charts
     neighbourhood_html = neighbourhood_crime_plot(selected_neighbourhoods)
-    street_html = street_crime_plot(selected_crime_types_db)
-    year_html = crimes_by_year(selected_years_range, selected_crime_types_temporal)
-    season_html = crimes_by_season(selected_crime_types_temporal)
-    day_html = crimes_by_day(selected_crime_types_temporal)
+    street_html = street_crime_plot(selected_crime_types_map)
 
     # Calculate the most dangerous Vancouver neighbourhood
     most_dangerous_neighbourhood = Counter(filtered_data_neighbourhood['NEIGHBOURHOOD']).most_common(1)[0][0]
@@ -283,9 +274,23 @@ def update_data(selected_crime_types_map, selected_neighbourhoods, selected_year
     # Calculate the most dangerous Vancouver street
     most_dangerous_street = Counter(filtered_data_db['HUNDRED_BLOCK']).most_common(1)[0][0]
 
-    return (updated_fig, neighbourhood_html, street_html, year_html, season_html, day_html,
+    return (updated_fig, neighbourhood_html, street_html,
             most_dangerous_neighbourhood,
             most_dangerous_street)
+
+@app.callback(
+    [Output('year-chart', 'srcDoc'),
+     Output('season-chart', 'srcDoc'),
+     Output('day-chart', 'srcDoc')],
+    [Input('year-slider', 'value'),
+     Input('crime-type-dropdown', 'value')])
+
+def update_data_temporal(selected_years_range, selected_crime_types_temporal):
+    # Filter data based on selected inputs
+    year_html = crimes_by_year(selected_years_range, selected_crime_types_temporal)
+    season_html = crimes_by_season(selected_years_range, selected_crime_types_temporal)
+    day_html = crimes_by_day(selected_years_range, selected_crime_types_temporal)
+    return (year_html, season_html, day_html)
 
 
 if __name__ == '__main__':
