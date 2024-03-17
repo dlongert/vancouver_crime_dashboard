@@ -183,7 +183,7 @@ app.layout = dbc.Container([
                                 id='neighbourhood-dropdown',
                                 options=[{'label': neighbourhood, 'value': neighbourhood} for neighbourhood in crime["NEIGHBOURHOOD"].unique()],
                                 value=[crime["NEIGHBOURHOOD"].unique()[i] for i in range(5)], multi=True),
-                        ], style={'textAlign': 'center'}),
+                        ], style={'textAlign': 'center', 'marginBottom': '20px'}),
                         html.Iframe(id='neighbourhood-chart',
                                     srcDoc=neighbourhood_crime_plot([crime["NEIGHBOURHOOD"].unique()[i] for i in range(5)]),
                                     style={'borderWidth': '0', 'width': '100%', 'height': '400px'})
@@ -193,7 +193,8 @@ app.layout = dbc.Container([
                         dcc.Dropdown(
                             id='crime-type-dropdown-db',
                             options=[{'label': crime_type, 'value': crime_type} for crime_type in crime["TYPE"].unique()],
-                            value=[crime["TYPE"].unique()[i] for i in range(5)], multi=True),
+                            value=[crime["TYPE"].unique()[i] for i in range(5)], multi=True, style={'marginBottom': '20px'}
+                            ),
                         html.Iframe(id='street-chart',
                                     srcDoc=street_crime_plot([crime["TYPE"].unique()[2]]),
                                     style={'borderWidth': '0', 'width': '100%', 'height': '400px'})
