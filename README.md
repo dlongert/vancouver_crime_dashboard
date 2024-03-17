@@ -1,5 +1,7 @@
 # Vancouver crimes dashboard
 
+We successfully deployed our dash to heroku, which can be found at https://vancouver-crime-dash-4e6e775fc6a6.herokuapp.com/
+
 ## Section 1: Motivation and Purpose
 
 We are a team focused on data science and public safety analytics, with the goal of using Vancouver crime data to help create a safer city. This dataset provides a unique perspective that allows us to drill down into crime patterns, identify high-risk areas and understand the origins of criminal activity in Vancouver. Through this analysis, our goal is to provide law enforcement agencies, city planners, and public safety officials with a visual analysis tool to help them develop more effective prevention strategies, rationally allocate resources, and ultimately reduce crime rates and improve resident safety.  
@@ -36,6 +38,3 @@ The centerpiece of this page is a line chart plotting the number of crimes again
 
 ## Second Page: Geographic Analysis of Crime 
 This page introduces a similar set of four dropdown bars at the top, specifying "neighborhood," "longitude," "latitude", and "type of crime." The main feature is a detailed map of Vancouver, divided into areas. Clicking on an area reveals a popup window that shows the average annual crime rate from 2003 to 2017. The dropdown selections allow for exploration of specific area maps and related information. At the bottom, two plots visualize crime distribution: the first is a horizontal bar chart depicting the total crimes in different neighborhoods over the years, and the second ranks the top 10 street names by crime incidence over the past 15 years. 
-
-
-We successfully deployed our dash to heroku, which can be found at https://vancouver-crime-dash-4e6e775fc6a6.herokuapp.com/
