@@ -115,7 +115,7 @@ def crimes_by_day(selected_years_range, selected_crime_types, selected_month):
     ).properties(title=f'Number of Crimes in {selected_month}', height=300, width=500)
     return chart.to_html()
 
-app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash(__name__, title = "Crime in Vancouver", external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
 logo_filename = 'image_folder/WechatIMG2476.png' 
