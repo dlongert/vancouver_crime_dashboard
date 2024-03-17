@@ -32,7 +32,10 @@ This persona description is a good example of the types of research questions a 
 ## First Page: Temporal Analysis of Crime
 At the top of the first page, users are greeted with dropdown boxes labeled "year," "month," "day," and "type of crime". These filters allow for precise data navigation. Below these, the statistics are displayed, offering insights such as the count of crimes on a specific day, or the average daily crime rate when a year or month is selected. The second column presents the annual total number of crimes, while the third column highlights the neighborhood with the highest crime rate for the current year. 
 
-The centerpiece of this page is a line chart plotting the number of crimes against years, selectable via an adjacent dropdown menu. At the bottom of the page, two diagrams provide further breakdowns: the left one displays a bar chart of crime numbers by season for the selected year, and the right one, a line chart showing daily crime counts for the selected year. 
+The centerpiece of this page is a line chart plotting the number of crimes against years, selectable via an adjacent dropdown menu. At the bottom of the page, two diagrams provide further breakdowns: the left one displays a bar chart of crime numbers by season for the selected year, and the right one, a line chart showing daily crime counts for the selected year.
 
 ## Second Page: Geographic Analysis of Crime 
 This page introduces a similar set of four dropdown bars at the top, specifying "neighborhood," "longitude," "latitude", and "type of crime." The main feature is a detailed map of Vancouver, divided into areas. Clicking on an area reveals a popup window that shows the average annual crime rate from 2003 to 2017. The dropdown selections allow for exploration of specific area maps and related information. At the bottom, two plots visualize crime distribution: the first is a horizontal bar chart depicting the total crimes in different neighborhoods over the years, and the second ranks the top 10 street names by crime incidence over the past 15 years. 
+
+
+We successfully deployed our dash to heroku, which can be found at https://vancouver-crime-dash-4e6e775fc6a6.herokuapp.com/
