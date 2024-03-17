@@ -36,3 +36,6 @@ The centerpiece of this page is a line chart plotting the number of crimes again
 
 ## Second Page: Geographic Analysis of Crime 
 This page introduces a similar set of four dropdown bars at the top, specifying "neighborhood," "longitude," "latitude", and "type of crime." The main feature is a detailed map of Vancouver, divided into areas. Clicking on an area reveals a popup window that shows the average annual crime rate from 2003 to 2017. The dropdown selections allow for exploration of specific area maps and related information. At the bottom, two plots visualize crime distribution: the first is a horizontal bar chart depicting the total crimes in different neighborhoods over the years, and the second ranks the top 10 street names by crime incidence over the past 15 years. 
+
+
+We successfully deployed our dash to heroku, which can be found at https://vancouver-crime-dash-4e6e775fc6a6.herokuapp.com/
