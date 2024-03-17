@@ -7,11 +7,11 @@ from dash import dcc, html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 from collections import Counter
+import base64
 
 alt.data_transformers.disable_max_rows()
 crime = pd.read_csv("data/processed/crime_processed.csv")
 crime = crime.dropna()
-# crime = crime.sample(n=5000, replace=False)
 crime["HUNDRED_BLOCK"] = crime["HUNDRED_BLOCK"].str.replace("\d*X+ ", "", regex=True)
 crime['DATE'] = pd.to_datetime(crime[['YEAR', 'MONTH', 'DAY']])
 
@@ -49,8 +49,8 @@ fig = go.Figure(data=heatmap_trace, layout=layout)
 def neighbourhood_crime_plot(selected_neighbourhoods):
     filtered_crime = crime[crime['NEIGHBOURHOOD'].isin(selected_neighbourhoods)]
     chart = alt.Chart(filtered_crime).mark_bar().encode(
-        alt.X("count()", title="Number of Crimes"),
-        alt.Y("NEIGHBOURHOOD", title="Neighbourhood", sort='x'),
+        x=alt.X("count()", title="Number of Crimes"),
+        y=alt.Y("NEIGHBOURHOOD", title = None, sort='-x'),
         tooltip=["NEIGHBOURHOOD", 'count()']
     ).properties(title="Number of Crimes by Neighbourhood", height=300, width=400)
     return chart.to_html()
@@ -63,7 +63,7 @@ def street_crime_plot(selected_crime_types):
     filtered_crime = filtered_crime[filtered_crime['HUNDRED_BLOCK'].str.replace("\d*X+ ", "", regex=True).isin(top_streets)]
     chart = alt.Chart(filtered_crime).mark_bar().encode(
         alt.X("count()", title="Number of Crimes"),
-        alt.Y("HUNDRED_BLOCK", title=None, sort='x'),
+        alt.Y("HUNDRED_BLOCK", title=None, sort='-x'),
         tooltip=["HUNDRED_BLOCK", 'count()']
     ).properties(title="Top 5 Streets by Number of Crimes", height=300, width=400)
     return chart.to_html()
@@ -118,7 +118,19 @@ def crimes_by_day(selected_years_range, selected_crime_types, selected_month):
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
+logo_filename = 'image_folder/WechatIMG2476.png' 
+encoded_logo = base64.b64encode(open(logo_filename, 'rb').read())
 app.layout = dbc.Container([
+     dbc.Row([
+        dbc.Col(html.Div(), width=9),  
+        dbc.Col(
+            html.Img(
+                src='data:image/png;base64,{}'.format(encoded_logo.decode()),
+                style={'height': '100px', 'float': 'right'}  
+            ),
+            width=3
+        ),
+    ]),
     dbc.Tabs([
         dbc.Tab([
             html.Div('Geographic Analysis of Crime in Vancouver', style={'color': 'red', 'fontSize': 44, 'textAlign': 'center'}),
@@ -181,7 +193,7 @@ app.layout = dbc.Container([
                         dcc.Dropdown(
                             id='crime-type-dropdown-db',
                             options=[{'label': crime_type, 'value': crime_type} for crime_type in crime["TYPE"].unique()],
-                            value=[crime["TYPE"].unique()[2]], multi=True),
+                            value=[crime["TYPE"].unique()[i] for i in range(5)], multi=True),
                         html.Iframe(id='street-chart',
                                     srcDoc=street_crime_plot([crime["TYPE"].unique()[2]]),
                                     style={'borderWidth': '0', 'width': '100%', 'height': '400px'})
