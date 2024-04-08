@@ -1,7 +1,5 @@
 # Vancouver crimes dashboard
 
-We successfully deployed our dash to heroku, which can be found at https://vancouver-crime-dash-4e6e775fc6a6.herokuapp.com/
-
 ## Section 1: Motivation and Purpose
 
 We are a team focused on data science and public safety analytics, with the goal of using Vancouver crime data to help create a safer city. This dataset provides a unique perspective that allows us to drill down into crime patterns, identify high-risk areas and understand the origins of criminal activity in Vancouver. Through this analysis, our goal is to provide law enforcement agencies, city planners, and public safety officials with a visual analysis tool to help them develop more effective prevention strategies, rationally allocate resources, and ultimately reduce crime rates and improve resident safety.  
